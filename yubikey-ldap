@@ -11,6 +11,8 @@ import sys
 import re
 import ldap
 import readline
+import getpass
+import os
 
 config_file = "yubikey-ldap.conf"
 
@@ -120,9 +122,12 @@ class YubiKeyManager(object):
                 self.con.set_option(ldap.OPT_X_TLS, ldap.OPT_X_TLS_DEMAND)
                 self.con.start_tls_s()
                 debug("STARTTLS succeeded. The connection is now secured.")
-            self.con.bind_s(conf.bind_dn, conf.bind_pw, ldap.AUTH_SIMPLE)
+            user = os.getlogin()
+            bind_dn = "uid={},{}".format(user,conf.base_dn)
+            pw = getpass.getpass()
+            self.con.bind_s(bind_dn, pw, ldap.AUTH_SIMPLE)
         except ldap.INVALID_CREDENTIALS:
-            fatal("Invalid credentials. Check bind_dn [%s] and bind_pw [%s] values." % (conf.bind_dn, conf.bind_pw))
+            fatal("Invalid credentials. Check bind_dn [%s] and password values." % (bind_dn))
         except ldap.SERVER_DOWN:
             fatal("Connection error. Check conf.uri value.")
         except ldap.LDAPError, e:
