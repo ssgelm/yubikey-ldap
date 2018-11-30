@@ -22,6 +22,8 @@ class conf(object):
     start_tls = False
     tls_cacertfile = ""
     tls_cacertpath = ""
+    tls_clientcertfile = ""
+    tls_clientkeyfile = ""
     yubi_id_len = 12
 
 class bcolours:
@@ -111,6 +113,10 @@ class YubiKeyManager(object):
                     self.con.set_option(ldap.OPT_X_TLS_CACERTPATH, conf.tls_cacertpath)
                 if conf.tls_cacertfile:
                     self.con.set_option(ldap.OPT_X_TLS_CACERTFILE, conf.tls_cacertfile)
+                if conf.tls_clientcertfile:
+                    ldap.set_option(ldap.OPT_X_TLS_CERTFILE, conf.tls_clientcertfile)
+                if conf.tls_clientkeyfile:
+                    ldap.set_option(ldap.OPT_X_TLS_KEYFILE, conf.tls_clientkeyfile)
                 self.con.set_option(ldap.OPT_X_TLS, ldap.OPT_X_TLS_DEMAND)
                 self.con.start_tls_s()
                 debug("STARTTLS succeeded. The connection is now secured.")
